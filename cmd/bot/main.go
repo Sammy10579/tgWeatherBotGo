@@ -1,7 +1,9 @@
 package main
 
 import (
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"fmt"
+	owm "github.com/briandowns/openweathermap"
+	"github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -10,6 +12,11 @@ import (
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
+	}
+
+	w, err := owm.NewCurrent("F", "ru", os.Getenv("OPENWEATHER_APITOKEN"))
+	if err != nil {
+		log.Fatalln(err)
 	}
 
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TELEGRAM_APITOKEN"))
@@ -27,6 +34,9 @@ func main() {
 	for update := range updates {
 		if update.Message != nil {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+			w.CurrentByName(update.Message.Text)
+			fmt.Println(w)
 		}
 	}
+
 }

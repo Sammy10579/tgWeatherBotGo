@@ -1,5 +1,10 @@
 # Golang weather bot
 
+# Import your:
+```
+TELEGRAM_APITOKEN and OPENWEATHER_APITOKEN in .env
+``` 
+
 # For use:
 
 ```
