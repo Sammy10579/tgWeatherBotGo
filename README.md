@@ -1,6 +1,6 @@
-#Golang weather bot
+# Golang weather bot
 
-#For use:
+# For use:
 
 ```
 go run cmd/bot/main.go
