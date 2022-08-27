@@ -1,16 +1,24 @@
 package App
 
-type Config struct {
-}
+import (
+	"fmt"
+	"tgWeatherBotGo/pkg/openweather"
+	"tgWeatherBotGo/pkg/telegam"
+)
 
 type Application struct {
-	config Config
+	Weather *openweather.OpenWeather
+	Bot     *telegam.Bot
 }
 
-func NewApplication(config Config) *Application {
-	return &Application{config: config}
+func NewApplication(Weather *openweather.OpenWeather, Bot *telegam.Bot) *Application {
+	return &Application{
+		Weather: Weather,
+		Bot:     Bot,
+	}
 }
 
 func (a *Application) Run() {
+	fmt.Println("Run Application")
 
 }

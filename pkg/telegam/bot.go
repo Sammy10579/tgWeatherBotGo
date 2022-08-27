@@ -1,6 +1,7 @@
 package telegam
 
 import (
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 )
@@ -13,7 +14,7 @@ func NewBot(bot *tgbotapi.BotAPI) *Bot {
 	return &Bot{bot: bot}
 }
 
-func (b *Bot) Start() error {
+func (b *Bot) Start(weather func(string) (string, error)) error {
 
 	log.Printf("Authorized on account %s", b.bot.Self.UserName)
 
@@ -21,15 +22,28 @@ func (b *Bot) Start() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	b.handleUpdates(updates)
+	b.handleUpdates(updates, weather)
 
 	return nil
 }
 
-func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
+func (b *Bot) handleUpdates(
+	updates tgbotapi.UpdatesChannel,
+	weather func(string) (string, error),
+) {
 	for update := range updates {
 		if update.Message != nil {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+			weatherInCity, err := weather(update.Message.Text)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, weatherInCity)
+
+			b.bot.Send(msg)
+
+			fmt.Println(weatherInCity)
 		}
 	}
 }

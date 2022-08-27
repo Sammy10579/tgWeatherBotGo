@@ -4,23 +4,28 @@ import (
 	"fmt"
 	owm "github.com/briandowns/openweathermap"
 	"log"
-	"os"
+	"strconv"
 )
 
 type OpenWeather struct {
-	o *OpenWeather
+	o *owm.CurrentWeatherData
 }
 
-func NewOpenWeather() *OpenWeather {
-	return &OpenWeather{}
+func NewOpenWeather(data *owm.CurrentWeatherData) *OpenWeather {
+	return &OpenWeather{o: data}
 }
 
-func (o *OpenWeather) OWStart() error {
-	w, err := owm.NewCurrent("F", "ru", os.Getenv("OPENWEATHER_APITOKEN"))
+func (o *OpenWeather) PrintWeather(city string) (answer string, err error) {
+	err = o.o.CurrentByName(city)
 	if err != nil {
-		log.Fatalln(err)
+		fmt.Println("Введите пожалуйста существующий город")
+		return
 	}
-	city := owm.City{}
-	w.CurrentByName(city)
-	fmt.Println(w)
+	answer = "Температура в г. " + city + " " + strconv.Itoa(int(o.o.Main.Temp))
+	return
+}
+
+func (o *OpenWeather) Start() error {
+	log.Println("OpenWeather api start")
+	return nil
 }
