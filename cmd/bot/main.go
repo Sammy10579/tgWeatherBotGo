@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"tgWeatherBotGo/pkg/openweather"
+	"tgWeatherBotGo/pkg/telegam"
 )
 
 func main() {
@@ -17,17 +19,11 @@ func main() {
 		log.Panic(err)
 	}
 
-	log.Printf("Authorized on account %s", bot.Self.UserName)
+	openWeather := openweather.NewOpenWeather()
 
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-
-	updates := bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		if update.Message != nil {
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-		}
+	telegramBot := telegam.NewBot(bot)
+	if err := telegramBot.Start(); err != nil {
+		log.Fatal(err)
 	}
 
 }

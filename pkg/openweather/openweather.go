@@ -1,4 +1,4 @@
-package service
+package openweather
 
 import (
 	"fmt"
@@ -7,18 +7,20 @@ import (
 	"os"
 )
 
-type WeatherService struct {
+type OpenWeather struct {
+	o *OpenWeather
 }
 
-func NewWeatherService() *WeatherService {
-	return &WeatherService{}
+func NewOpenWeather() *OpenWeather {
+	return &OpenWeather{}
 }
 
-func (s *WeatherService) Get(city string) {
+func (o *OpenWeather) OWStart() error {
 	w, err := owm.NewCurrent("F", "ru", os.Getenv("OPENWEATHER_APITOKEN"))
 	if err != nil {
 		log.Fatalln(err)
 	}
+	city := owm.City{}
 	w.CurrentByName(city)
 	fmt.Println(w)
 }
