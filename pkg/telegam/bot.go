@@ -36,11 +36,12 @@ func (b *Bot) handleUpdates(
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 			weatherInCity, err := weather(update.Message.Text)
 			if err != nil {
-				fmt.Println(err)
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Введите существующий город")
+				b.bot.Send(msg)
 				continue
 			}
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, weatherInCity)
 
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, weatherInCity)
 			b.bot.Send(msg)
 
 			fmt.Println(weatherInCity)
