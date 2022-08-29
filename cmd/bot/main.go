@@ -32,7 +32,7 @@ func main() {
 	}
 
 	telegramBot := telegam.NewBot(bot)
-	if err := telegramBot.Start(openWeather.PrintWeather); err != nil {
+	if err := telegramBot.Start(openWeather.ByCity, openWeather.ByLocation); err != nil {
 		log.Fatal(err)
 	}
 

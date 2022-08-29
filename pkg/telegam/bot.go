@@ -14,7 +14,10 @@ func NewBot(bot *tgbotapi.BotAPI) *Bot {
 	return &Bot{bot: bot}
 }
 
-func (b *Bot) Start(weather func(string) (string, error)) error {
+func (b *Bot) Start(
+	weatherByCity func(string) (string, error),
+	weatherByLocation func(float64, float64) (string, error),
+) error {
 
 	log.Printf("Authorized on account %s", b.bot.Self.UserName)
 
@@ -22,29 +25,43 @@ func (b *Bot) Start(weather func(string) (string, error)) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	b.handleUpdates(updates, weather)
+	b.handleUpdates(updates, weatherByCity, weatherByLocation)
 
 	return nil
 }
 
 func (b *Bot) handleUpdates(
 	updates tgbotapi.UpdatesChannel,
-	weather func(string) (string, error),
+	weatherByCity func(string) (string, error),
+	weatherByLocation func(float64, float64) (string, error),
 ) {
 	for update := range updates {
 		if update.Message != nil {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-			weatherInCity, err := weather(update.Message.Text)
-			if err != nil {
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Введите существующий город")
+
+			if update.Message.Location != nil {
+				weatherInLocation, err := weatherByLocation(update.Message.Location.Longitude, update.Message.Location.Latitude)
+				if err != nil {
+					msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Отправьте мне локацию")
+					b.bot.Send(msg)
+					continue
+				}
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, weatherInLocation)
 				b.bot.Send(msg)
-				continue
+			} else {
+				weatherInCity, err := weatherByCity(update.Message.Text)
+				if err != nil {
+					fmt.Println(err)
+					msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Введите пожалуйста существующий город")
+					b.bot.Send(msg)
+					continue
+				}
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, weatherInCity)
+				b.bot.Send(msg)
+
+				fmt.Println(weatherInCity)
 			}
 
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, weatherInCity)
-			b.bot.Send(msg)
-
-			fmt.Println(weatherInCity)
 		}
 	}
 }
