@@ -35,7 +35,6 @@ func (b *Bot) Start() error {
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
 		if update.Message != nil {
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 			weather, err := b.massageHandler(update.Message)
 			if err != nil {
