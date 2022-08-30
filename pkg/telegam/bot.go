@@ -17,6 +17,7 @@ func NewBot(bot *tgbotapi.BotAPI) *Bot {
 
 func (b *Bot) MassageHandler(fn func(message *tgbotapi.Message) (answer string, err error)) {
 	b.massageHandler = fn
+	return
 }
 
 func (b *Bot) Start() error {
@@ -38,7 +39,7 @@ func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 
 			weather, err := b.massageHandler(update.Message)
 			if err != nil {
-				weather = "Отправьте мне локацию"
+				fmt.Println(err)
 			}
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, weather)
 			b.bot.Send(msg)

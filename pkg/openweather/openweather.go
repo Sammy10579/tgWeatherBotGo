@@ -20,8 +20,8 @@ func NewOpenWeather(data *owm.CurrentWeatherData) *OpenWeather {
 func (o *OpenWeather) ByCity(city string) (answer string, err error) {
 	err = o.o.CurrentByName(city)
 	if err != nil {
-		fmt.Println("Введите пожалуйста существующий город")
-		return
+		fmt.Println(err)
+		return "Введите пожалуйста существующий город", err
 	}
 	answer = "Температура в г. " + city + " " + strconv.Itoa(int(o.o.Main.Temp))
 	return
@@ -34,8 +34,8 @@ func (o *OpenWeather) ByLocation(long, lat float64) (answer string, err error) {
 		Latitude:  lat,
 	})
 	if err != nil {
-		fmt.Println("Нет такой локации")
-		return "", err
+		fmt.Println(err)
+		return "Нет такой локации", err
 	}
 	answer = "Температура в " + o.o.Name + " " + strconv.Itoa(int(o.o.Main.Temp))
 	fmt.Println(long, lat)

@@ -19,11 +19,12 @@ func NewApplication(Weather *openweather.OpenWeather, Bot *telegam.Bot) *Applica
 	}
 }
 
-func (a *Application) Run() {
+func (a *Application) Run() error {
 	fmt.Println("Run Application")
 	a.Bot.MassageHandler(a.Weather.Weather)
 
 	if err := a.Bot.Start(); err != nil {
 		log.Fatal(err)
 	}
+	return nil
 }
