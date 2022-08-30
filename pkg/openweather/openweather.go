@@ -3,12 +3,14 @@ package openweather
 import (
 	"fmt"
 	owm "github.com/briandowns/openweathermap"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"strconv"
 )
 
 type OpenWeather struct {
-	o *owm.CurrentWeatherData
+	o   *owm.CurrentWeatherData
+	bot *tgbotapi.BotAPI
 }
 
 func NewOpenWeather(data *owm.CurrentWeatherData) *OpenWeather {
@@ -37,6 +39,25 @@ func (o *OpenWeather) ByLocation(long, lat float64) (answer string, err error) {
 	}
 	answer = "Температура в " + o.o.Name + " " + strconv.Itoa(int(o.o.Main.Temp))
 	fmt.Println(long, lat)
+	return
+}
+
+func (o *OpenWeather) Weather(message *tgbotapi.Message) (answer string, err error) {
+	if message != nil {
+		log.Printf("[%s] %s", message.From.UserName, message.Text)
+
+		if message.Location != nil {
+			answer, err = o.ByLocation(message.Location.Longitude, message.Location.Latitude)
+			if err != nil {
+				fmt.Println(err)
+			}
+		} else {
+			answer, err = o.ByCity(message.Text)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+	}
 	return
 }
 
