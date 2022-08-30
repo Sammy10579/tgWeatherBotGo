@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
@@ -32,9 +33,6 @@ func main() {
 	}
 
 	telegramBot := telegam.NewBot(bot)
-	if err := telegramBot.Start(openWeather.Weather); err != nil {
-		log.Fatal(err)
-	}
 
 	App := App2.NewApplication(openWeather, telegramBot)
 	App.Run()

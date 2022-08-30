@@ -2,21 +2,24 @@ package telegam
 
 import (
 	"fmt"
-	owm "github.com/briandowns/openweathermap"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 )
 
 type Bot struct {
-	bot *tgbotapi.BotAPI
-	o   *owm.CurrentWeatherData
+	bot            *tgbotapi.BotAPI
+	massageHandler func(message *tgbotapi.Message) (answer string, err error)
 }
 
 func NewBot(bot *tgbotapi.BotAPI) *Bot {
 	return &Bot{bot: bot}
 }
 
-func (b *Bot) Start(weather func(message *tgbotapi.Message) (answer string, err error)) error {
+func (b *Bot) MassageHandler(fn func(message *tgbotapi.Message) (answer string, err error)) {
+	b.massageHandler = fn
+}
+
+func (b *Bot) Start() error {
 
 	log.Printf("Authorized on account %s", b.bot.Self.UserName)
 
@@ -24,17 +27,17 @@ func (b *Bot) Start(weather func(message *tgbotapi.Message) (answer string, err 
 	if err != nil {
 		log.Fatal(err)
 	}
-	b.handleUpdates(updates, weather)
+	b.handleUpdates(updates)
 
 	return nil
 }
 
-func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel, weather func(message *tgbotapi.Message) (answer string, err error)) {
+func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
 		if update.Message != nil {
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-			weather, err := weather(update.Message)
+			weather, err := b.massageHandler(update.Message)
 			if err != nil {
 				weather = "Отправьте мне локацию"
 			}
